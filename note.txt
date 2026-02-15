@@ -1,0 +1,19 @@
+~/Downloads/episode_000031.mp4 
+~/Downloads/concatenated_horizontal.mp4 (1536, 432)
+
+bbox "top left" + "size"
+
+real table 위치 (682)
+real 로봇 중앙 (275, 395)
+real 물체 bbox (96, 670) (439, 184)
+robot torso (131, 204) (280, 258)
+
+neural table 위치 (687)
+neural 로봇 중앙 (265, 385)
+neural 물체 bbox (57, 682), (475, 192)
+robot torso (118, 190) (299, 273)
+
+ours table 위치 (769)
+ours 로봇 중앙 (240, 500)
+ours 물체 bbox (10, 755), (454, 177)
+robot torso (148, 379) (236, 224)

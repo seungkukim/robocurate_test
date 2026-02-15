@@ -3,24 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="description"
-        content="Deformable Neural Radiance Fields creates free-viewpoint portraits (nerfies) from casually captured videos.">
-  <meta name="keywords" content="Nerfies, D-NeRF, NeRF">
+        content="RoboCurate: A neural trajectory generation and filtering framework that increases diversity via controllable video generation and filters low-quality samples.">
+  <meta name="keywords" content="RoboCurate, robot learning, data augmentation, video generation, action filtering">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nerfies: Deformable Neural Radiance Fields</title>
-
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-
-    gtag('js', new Date());
-
-    gtag('config', 'G-PYVRSFMDRL');
-  </script>
+  <title>RoboCurate: Harnessing Diversity with Action-Verified Neural Trajectory for Robot Learning</title>
 
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
         rel="stylesheet">
@@ -32,104 +18,224 @@
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="./static/css/index.css">
-  <link rel="icon" href="./static/images/favicon.svg">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script defer src="./static/js/fontawesome.all.min.js"></script>
   <script src="./static/js/bulma-carousel.min.js"></script>
   <script src="./static/js/bulma-slider.min.js"></script>
   <script src="./static/js/index.js"></script>
+
+  <style>
+    /* ── RoboCurate custom styles ── */
+    .robocurate {
+      font-weight: 700;
+    }
+
+    /* Video grid */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .video-grid .video-cell {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .video-grid .video-cell video {
+      width: 100%;
+      display: block;
+      border-radius: 8px;
+    }
+
+    .video-grid .video-cell .video-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.65));
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 16px 8px 6px;
+      text-align: center;
+      font-family: 'Google Sans', sans-serif;
+    }
+
+    .video-grid .video-cell .outcome-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'Google Sans', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .outcome-success { background: rgba(72,199,142,0.90); color: #fff; }
+    .outcome-partial { background: rgba(255,183,77,0.90); color: #fff; }
+    .outcome-fail    { background: rgba(241,70,104,0.90); color: #fff; }
+
+    /* Column & row headers for the grid */
+    .grid-header {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 960px;
+      margin: 0 auto 4px;
+      text-align: center;
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #363636;
+    }
+
+    .grid-header .ours-highlight {
+      color: #E65100;
+    }
+
+    .row-label {
+      max-width: 960px;
+      margin: 18px auto 6px;
+      font-family: 'Google Sans', sans-serif;
+      font-size: 1.1rem;
+      color: #555;
+    }
+    .row-label:first-of-type {
+      margin-top: 10px;
+    }
+
+    /* Result image styling */
+    .result-image {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+
+    /* Method section numbered steps */
+    .method-step {
+      margin-bottom: 1.5rem;
+    }
+    .method-step .step-title {
+      font-weight: 700;
+      font-family: 'Google Sans', sans-serif;
+      font-size: 1.05rem;
+      margin-bottom: 0.25rem;
+    }
+    .method-step .method-figure {
+      margin-top: 0.75rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      width: 100%;
+    }
+
+    /* Main figure */
+    .main-figure img {
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    /* Observation paragraph */
+    .observation {
+      background: #f5f7fa;
+      border-left: 4px solid hsl(204, 86%, 53%);
+      padding: 1rem 1.25rem;
+      border-radius: 0 8px 8px 0;
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+      color: #4a4a4a;
+    }
+
+    /* Action alignment 2-column layout */
+    .action-overview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+    .action-overview-grid .action-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      justify-content: center;
+    }
+    .action-overview-grid .action-item video {
+      width: 100%;
+      border-radius: 8px;
+      display: block;
+    }
+    .action-overview-grid .action-item .caption,
+    .action-overview-grid .data-col .caption {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 0.85rem;
+      color: #555;
+      text-align: center;
+      margin-top: 4px;
+      white-space: nowrap;
+    }
+    .action-overview-grid .data-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .action-overview-grid .data-col img {
+      width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    @media (max-width: 768px) {
+      .action-overview-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<nav class="navbar" role="navigation" aria-label="main navigation">
-  <div class="navbar-brand">
-    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </a>
-  </div>
-  <div class="navbar-menu">
-    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
-      <a class="navbar-item" href="https://keunhong.com">
-      <span class="icon">
-          <i class="fas fa-home"></i>
-      </span>
-      </a>
 
-      <div class="navbar-item has-dropdown is-hoverable">
-        <a class="navbar-link">
-          More Research
-        </a>
-        <div class="navbar-dropdown">
-          <a class="navbar-item" href="https://hypernerf.github.io">
-            HyperNeRF
-          </a>
-          <a class="navbar-item" href="https://nerfies.github.io">
-            Nerfies
-          </a>
-          <a class="navbar-item" href="https://latentfusion.github.io">
-            LatentFusion
-          </a>
-          <a class="navbar-item" href="https://photoshape.github.io">
-            PhotoShape
-          </a>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</nav>
-
-
+<!-- Hero / Title -->
 <section class="hero">
   <div class="hero-body">
     <div class="container is-max-desktop">
       <div class="columns is-centered">
         <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title">Nerfies: Deformable Neural Radiance Fields</h1>
+          <h1 class="title is-1 publication-title"><span class="robocurate">RoboCurate</span>: Harnessing Diversity with Action-Verified Neural Trajectory for Robot Learning</h1>
           <div class="is-size-5 publication-authors">
             <span class="author-block">
-              <a href="https://keunhong.com">Keunhong Park</a><sup>1</sup>,</span>
+              Seungku Kim<sup>*1</sup>,</span>
             <span class="author-block">
-              <a href="https://utkarshsinha.com">Utkarsh Sinha</a><sup>2</sup>,</span>
+              Suhyeok Jang<sup>*1</sup>,</span>
             <span class="author-block">
-              <a href="https://jonbarron.info">Jonathan T. Barron</a><sup>2</sup>,
-            </span>
+              Byungjun Yoon<sup>1</sup>,</span>
             <span class="author-block">
-              <a href="http://sofienbouaziz.com">Sofien Bouaziz</a><sup>2</sup>,
-            </span>
+              Dongyoung Kim<sup>1,2</sup>,</span>
             <span class="author-block">
-              <a href="https://www.danbgoldman.com">Dan B Goldman</a><sup>2</sup>,
-            </span>
+              John Won<sup>1</sup>,</span>
             <span class="author-block">
-              <a href="https://homes.cs.washington.edu/~seitz/">Steven M. Seitz</a><sup>1,2</sup>,
-            </span>
-            <span class="author-block">
-              <a href="http://www.ricardomartinbrualla.com">Ricardo Martin-Brualla</a><sup>2</sup>
-            </span>
+              Jinwoo Shin<sup>1,2</sup></span>
           </div>
 
-          <div class="is-size-5 publication-authors">
-            <span class="author-block"><sup>1</sup>University of Washington,</span>
-            <span class="author-block"><sup>2</sup>Google Research</span>
+          <div class="is-size-7 publication-authors" style="margin-top:2px; color:#888;">
+            <span>*Equal contribution</span>
+          </div>
+
+          <div class="is-size-5 publication-authors" style="margin-top:6px;">
+            <span class="author-block"><sup>1</sup>KAIST,</span>
+            <span class="author-block"><sup>2</sup>RLWRLD</span>
           </div>
 
           <div class="column has-text-centered">
             <div class="publication-links">
-              <!-- PDF Link. -->
+              <!-- arXiv Link (placeholder – TBD) -->
               <span class="link-block">
-                <a href="https://arxiv.org/pdf/2011.12948"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fas fa-file-pdf"></i>
-                  </span>
-                  <span>Paper</span>
-                </a>
-              </span>
-              <span class="link-block">
-                <a href="https://arxiv.org/abs/2011.12948"
+                <a href="#"
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                       <i class="ai ai-arxiv"></i>
@@ -137,348 +243,254 @@
                   <span>arXiv</span>
                 </a>
               </span>
-              <!-- Video Link. -->
-              <span class="link-block">
-                <a href="https://www.youtube.com/watch?v=MrKrnHhk8IA"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fab fa-youtube"></i>
-                  </span>
-                  <span>Video</span>
-                </a>
-              </span>
-              <!-- Code Link. -->
-              <span class="link-block">
-                <a href="https://github.com/google/nerfies"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="fab fa-github"></i>
-                  </span>
-                  <span>Code</span>
-                  </a>
-              </span>
-              <!-- Dataset Link. -->
-              <span class="link-block">
-                <a href="https://github.com/google/nerfies/releases/tag/0.1"
-                   class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                      <i class="far fa-images"></i>
-                  </span>
-                  <span>Data</span>
-                  </a>
             </div>
-
           </div>
+
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="hero teaser">
-  <div class="container is-max-desktop">
-    <div class="hero-body">
-      <video id="teaser" autoplay muted loop playsinline height="100%">
-        <source src="./static/videos/teaser.mp4"
-                type="video/mp4">
-      </video>
-      <h2 class="subtitle has-text-centered">
-        <span class="dnerf">Nerfies</span> turns selfie videos from your phone into
-        free-viewpoint
-        portraits.
-      </h2>
-    </div>
-  </div>
-</section>
 
-
+<!-- Main Figure -->
 <section class="hero is-light is-small">
   <div class="hero-body">
-    <div class="container">
-      <div id="results-carousel" class="carousel results-carousel">
-        <div class="item item-steve">
-          <video poster="" id="steve" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/steve.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-chair-tp">
-          <video poster="" id="chair-tp" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/chair-tp.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-shiba">
-          <video poster="" id="shiba" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/shiba.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-fullbody">
-          <video poster="" id="fullbody" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/fullbody.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-blueshirt">
-          <video poster="" id="blueshirt" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/blueshirt.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-mask">
-          <video poster="" id="mask" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/mask.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-coffee">
-          <video poster="" id="coffee" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/coffee.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-toby">
-          <video poster="" id="toby" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/toby2.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-      </div>
+    <div class="container is-max-desktop has-text-centered main-figure">
+      <img src="./static/images/robocurate_main_figure.png"
+           alt="RoboCurate overview figure"
+           style="width:100%;">
     </div>
   </div>
 </section>
 
 
+<!-- Abstract -->
 <section class="section">
   <div class="container is-max-desktop">
-    <!-- Abstract. -->
     <div class="columns is-centered has-text-centered">
       <div class="column is-four-fifths">
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            We present the first method capable of photorealistically reconstructing a non-rigidly
-            deforming scene using photos/videos captured casually from mobile phones.
-          </p>
-          <p>
-            Our approach augments neural radiance fields
-            (NeRF) by optimizing an
-            additional continuous volumetric deformation field that warps each observed point into a
-            canonical 5D NeRF.
-            We observe that these NeRF-like deformation fields are prone to local minima, and
-            propose a coarse-to-fine optimization method for coordinate-based models that allows for
-            more robust optimization.
-            By adapting principles from geometry processing and physical simulation to NeRF-like
-            models, we propose an elastic regularization of the deformation field that further
-            improves robustness.
-          </p>
-          <p>
-            We show that <span class="dnerf">Nerfies</span> can turn casually captured selfie
-            photos/videos into deformable NeRF
-            models that allow for photorealistic renderings of the subject from arbitrary
-            viewpoints, which we dub <i>"nerfies"</i>. We evaluate our method by collecting data
-            using a
-            rig with two mobile phones that take time-synchronized photos, yielding train/validation
-            images of the same pose at different viewpoints. We show that our method faithfully
-            reconstructs non-rigidly deforming scenes and reproduces unseen views with high
-            fidelity.
+            We present <span class="robocurate">RoboCurate</span>, a novel neural trajectory generation framework that increases diversity via controllable video generation and filters low-quality samples by evaluating motion similarity between generated video and simulator replay. Specifically, <span class="robocurate">RoboCurate</span> replays the predicted actions in a simulator and assesses action quality by measuring the consistency of motion between the simulator rollout and the generated video. In addition, we unlock observation diversity beyond the available dataset via image-to-image editing and apply action-preserving video-to-video transfer to further augment appearance.
           </p>
         </div>
       </div>
     </div>
-    <!--/ Abstract. -->
-
-    <!-- Paper video. -->
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h2 class="title is-3">Video</h2>
-        <div class="publication-video">
-          <iframe src="https://www.youtube.com/embed/MrKrnHhk8IA?rel=0&amp;showinfo=0"
-                  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-        </div>
-      </div>
-    </div>
-    <!--/ Paper video. -->
   </div>
 </section>
 
 
+<!-- Method -->
+<section class="section has-background-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 has-text-centered">Method</h2>
+        <div class="content has-text-justified">
+
+          <div class="method-step">
+            <p class="step-title">1.&ensp;Generation Stage</p>
+            <p>
+              We expand observation diversity with two components: (1) image-to-image (I2I) editing on the initial frame for scene-level variation, and (2) video-to-video (V2V) transfer for appearance diversity while preserving initial motion.
+            </p>
+            <img class="method-figure" src="./static/images/robocurate_stage1_generation.png"
+                 alt="Generation stage overview">
+          </div>
+
+          <div class="method-step">
+            <p class="step-title">2.&ensp;Filtering Stage</p>
+            <p>
+              We filter suboptimal synthetic trajectories with inaccurate actions by replaying the predicted actions in a simulator and assessing action quality by measuring the consistency of motion between the simulator rollout and the generated video. We train an attentive probe on top of a frozen video encoder to measure motion similarity between the simulator rollout and the generated video with automatically generated positive and negative samples from real data.
+            </p>
+            <img class="method-figure" src="./static/images/robocurate_stage2_filtering.png"
+                 alt="Filtering stage overview">
+          </div>
+
+        </div>
+
+        <!-- Action alignment & data overview 2-column -->
+        <div class="action-overview-grid" style="max-width: 100%;">
+          <div class="action-col">
+            <div class="action-item">
+              <video autoplay muted loop playsinline>
+                <source src="./videos/good_action_alignment.mp4" type="video/mp4">
+              </video>
+              <p class="caption">Accurate action: Simulator rollout ≈ Synthetic video</p>
+            </div>
+            <div class="action-item">
+              <video autoplay muted loop playsinline>
+                <source src="./videos/bad_action_alignment.mp4" type="video/mp4">
+              </video>
+              <p class="caption">Inaccurate action: Simulator rollout ≠ Synthetic video</p>
+            </div>
+          </div>
+          <div class="data-col">
+            <img src="./static/images/data_overview.png"
+                 alt="Examples of positive and negative pairs for attentive probe training">
+            <p class="caption">Examples of positive and negative pairs for attentive probe training.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Results: ALLEX Humanoid -->
 <section class="section">
   <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Results</h2>
 
-    <div class="columns is-centered">
+    <h3 class="title is-4 has-text-centered" style="margin-bottom:0.5rem;">ALLEX Humanoid Robot</h3>
 
-      <!-- Visual Effects. -->
-      <div class="column">
-        <div class="content">
-          <h2 class="title is-3">Visual Effects</h2>
-          <p>
-            Using <i>nerfies</i> you can create fun visual effects. This Dolly zoom effect
-            would be impossible without nerfies since it would require going through a wall.
-          </p>
-          <video id="dollyzoom" autoplay controls muted loop playsinline height="100%">
-            <source src="./static/videos/dollyzoom-stacked.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
+    <!-- Column headers -->
+    <div class="grid-header">
+      <span>Real</span>
+      <span>Real + DreamGen</span>
+      <span class="ours-highlight">Real + <span class="robocurate">RoboCurate</span> (Ours)</span>
+    </div>
+
+    <!-- Row 1: In-distribution – Pick and Place Can -->
+    <p class="row-label"><strong>In-distribution task</strong> &mdash; Pick and Place Can</p>
+    <div class="video-grid">
+      <div class="video-cell">
+        <video autoplay muted loop playsinline>
+          <source src="./videos/real_demo_pnp_can_fail.mp4" type="video/mp4">
+        </video>
+        <span class="outcome-badge outcome-fail">Fail</span>
       </div>
-      <!--/ Visual Effects. -->
+      <div class="video-cell">
+        <video autoplay muted loop playsinline>
+          <source src="./videos/neural_demo_pnp_can_success.mp4" type="video/mp4">
+        </video>
+        <span class="outcome-badge outcome-success">Success</span>
+      </div>
+      <div class="video-cell">
+        <video autoplay muted loop playsinline>
+          <source src="./videos/ours_demo_pnp_can_success.mp4" type="video/mp4">
+        </video>
+        <span class="outcome-badge outcome-success">Success</span>
+      </div>
+    </div>
 
-      <!-- Matting. -->
-      <div class="column">
-        <h2 class="title is-3">Matting</h2>
-        <div class="columns is-centered">
-          <div class="column content">
-            <p>
-              As a byproduct of our method, we can also solve the matting problem by ignoring
-              samples that fall outside of a bounding box during rendering.
-            </p>
-            <video id="matting-video" controls playsinline height="100%">
-              <source src="./static/videos/matting.mp4"
-                      type="video/mp4">
-            </video>
-          </div>
+    <!-- Row 2: OOD Novel Object – Pick and Place Cup -->
+    <p class="row-label"><strong>Out-of-distribution task (Novel Object)</strong> &mdash; Pick and Place Cup</p>
+    <div class="video-grid">
+      <div class="video-cell">
+        <video autoplay muted loop playsinline>
+          <source src="./videos/real_demo_pnp_cup_fail.mp4" type="video/mp4">
+        </video>
+        <span class="outcome-badge outcome-fail">Fail</span>
+      </div>
+      <div class="video-cell">
+        <video autoplay muted loop playsinline>
+          <source src="./videos/neural_demo_pnp_cup_partial.mp4" type="video/mp4">
+        </video>
+        <span class="outcome-badge outcome-partial">Partial</span>
+      </div>
+      <div class="video-cell">
+        <video autoplay muted loop playsinline>
+          <source src="./videos/ours_demo_pnp_cup_success.mp4" type="video/mp4">
+        </video>
+        <span class="outcome-badge outcome-success">Success</span>
+      </div>
+    </div>
 
+    <!-- Row 3: OOD Novel Behavior – Pour Can -->
+    <p class="row-label"><strong>Out-of-distribution task (Novel Behavior)</strong> &mdash; Pour Can</p>
+    <div class="video-grid">
+      <div class="video-cell">
+        <video autoplay muted loop playsinline>
+          <source src="./videos/real_demo_pour_fail.mp4" type="video/mp4">
+        </video>
+        <span class="outcome-badge outcome-fail">Fail</span>
+      </div>
+      <div class="video-cell">
+        <video autoplay muted loop playsinline>
+          <source src="./videos/neural_demo_pour_fail.mp4" type="video/mp4">
+        </video>
+        <span class="outcome-badge outcome-fail">Fail</span>
+      </div>
+      <div class="video-cell">
+        <video autoplay muted loop playsinline>
+          <source src="./videos/ours_demo_pour_success.mp4" type="video/mp4">
+        </video>
+        <span class="outcome-badge outcome-success">Success</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Results: GR-1 Tabletop & DexMimicGen -->
+<section class="section has-background-light">
+  <div class="container is-max-desktop">
+
+    <!-- GR-1 Tabletop -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h3 class="title is-4">GR-1 Tabletop</h3>
+        <p class="content has-text-justified" style="margin-bottom:1rem;">
+          We report the average success rate (%) over 50 trials across 24 tasks (18 rearrangement and 6 articulated).
+        </p>
+        <img class="result-image" src="./static/images/gr1_tabletop_result.png"
+             alt="GR-1 Tabletop results table"
+             style="width:100%;">
+      </div>
+    </div>
+
+    <br>
+
+    <!-- DexMimicGen -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h3 class="title is-4">DexMimicGen</h3>
+        <p class="content has-text-justified" style="margin-bottom:1rem;">
+          We report the average success rate (%) over 50 trials across 6 tasks (3 GR-1 Humanoid and 3 Bimanual Panda Arms with Dexterous Hands), trained with 100 demonstrations per task.
+        </p>
+        <img class="result-image" src="./static/images/dexmimicgen_result.png"
+             alt="DexMimicGen results table"
+             style="width:100%;">
+      </div>
+    </div>
+
+    <!-- Observation -->
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <div class="observation">
+          We observe that our visual augmentation pipeline (e.g., I2I editing and V2V transfer) substantially improves downstream task performance. Moreover, our action-level filtering is effective for curating neural trajectories and further enhances VLA performance.
         </div>
       </div>
     </div>
-    <!--/ Matting. -->
-
-    <!-- Animation. -->
-    <div class="columns is-centered">
-      <div class="column is-full-width">
-        <h2 class="title is-3">Animation</h2>
-
-        <!-- Interpolating. -->
-        <h3 class="title is-4">Interpolating states</h3>
-        <div class="content has-text-justified">
-          <p>
-            We can also animate the scene by interpolating the deformation latent codes of two input
-            frames. Use the slider here to linearly interpolate between the left frame and the right
-            frame.
-          </p>
-        </div>
-        <div class="columns is-vcentered interpolation-panel">
-          <div class="column is-3 has-text-centered">
-            <img src="./static/images/interpolate_start.jpg"
-                 class="interpolation-image"
-                 alt="Interpolate start reference image."/>
-            <p>Start Frame</p>
-          </div>
-          <div class="column interpolation-video-column">
-            <div id="interpolation-image-wrapper">
-              Loading...
-            </div>
-            <input class="slider is-fullwidth is-large is-info"
-                   id="interpolation-slider"
-                   step="1" min="0" max="100" value="0" type="range">
-          </div>
-          <div class="column is-3 has-text-centered">
-            <img src="./static/images/interpolate_end.jpg"
-                 class="interpolation-image"
-                 alt="Interpolation end reference image."/>
-            <p class="is-bold">End Frame</p>
-          </div>
-        </div>
-        <br/>
-        <!--/ Interpolating. -->
-
-        <!-- Re-rendering. -->
-        <h3 class="title is-4">Re-rendering the input video</h3>
-        <div class="content has-text-justified">
-          <p>
-            Using <span class="dnerf">Nerfies</span>, you can re-render a video from a novel
-            viewpoint such as a stabilized camera by playing back the training deformations.
-          </p>
-        </div>
-        <div class="content has-text-centered">
-          <video id="replay-video"
-                 controls
-                 muted
-                 preload
-                 playsinline
-                 width="75%">
-            <source src="./static/videos/replay.mp4"
-                    type="video/mp4">
-          </video>
-        </div>
-        <!--/ Re-rendering. -->
-
-      </div>
-    </div>
-    <!--/ Animation. -->
-
-
-    <!-- Concurrent Work. -->
-    <div class="columns is-centered">
-      <div class="column is-full-width">
-        <h2 class="title is-3">Related Links</h2>
-
-        <div class="content has-text-justified">
-          <p>
-            There's a lot of excellent work that was introduced around the same time as ours.
-          </p>
-          <p>
-            <a href="https://arxiv.org/abs/2104.09125">Progressive Encoding for Neural Optimization</a> introduces an idea similar to our windowed position encoding for coarse-to-fine optimization.
-          </p>
-          <p>
-            <a href="https://www.albertpumarola.com/research/D-NeRF/index.html">D-NeRF</a> and <a href="https://gvv.mpi-inf.mpg.de/projects/nonrigid_nerf/">NR-NeRF</a>
-            both use deformation fields to model non-rigid scenes.
-          </p>
-          <p>
-            Some works model videos with a NeRF by directly modulating the density, such as <a href="https://video-nerf.github.io/">Video-NeRF</a>, <a href="https://www.cs.cornell.edu/~zl548/NSFF/">NSFF</a>, and <a href="https://neural-3d-video.github.io/">DyNeRF</a>
-          </p>
-          <p>
-            There are probably many more by the time you are reading this. Check out <a href="https://dellaert.github.io/NeRF/">Frank Dellart's survey on recent NeRF papers</a>, and <a href="https://github.com/yenchenlin/awesome-NeRF">Yen-Chen Lin's curated list of NeRF papers</a>.
-          </p>
-        </div>
-      </div>
-    </div>
-    <!--/ Concurrent Work. -->
 
   </div>
 </section>
 
 
-<section class="section" id="BibTeX">
+<!-- BibTeX (placeholder) -->
+<!-- <section class="section" id="BibTeX">
   <div class="container is-max-desktop content">
     <h2 class="title">BibTeX</h2>
-    <pre><code>@article{park2021nerfies,
-  author    = {Park, Keunhong and Sinha, Utkarsh and Barron, Jonathan T. and Bouaziz, Sofien and Goldman, Dan B and Seitz, Steven M. and Martin-Brualla, Ricardo},
-  title     = {Nerfies: Deformable Neural Radiance Fields},
-  journal   = {ICCV},
-  year      = {2021},
+    <pre><code>@article{kim2025robocurate,
+  author    = {Kim, Seungku and Jang, Suhyeok and Yoon, Byungjun and Kim, Dongyoung and Won, John and Shin, Jinwoo},
+  title     = {RoboCurate: Neural Trajectory Generation and Filtering},
+  year      = {2025},
 }</code></pre>
   </div>
-</section>
+</section> -->
 
 
 <footer class="footer">
   <div class="container">
-    <div class="content has-text-centered">
-      <a class="icon-link"
-         href="./static/videos/nerfies_paper.pdf">
-        <i class="fas fa-file-pdf"></i>
-      </a>
-      <a class="icon-link" href="https://github.com/keunhong" class="external-link" disabled>
-        <i class="fab fa-github"></i>
-      </a>
-    </div>
     <div class="columns is-centered">
       <div class="column is-8">
-        <div class="content">
+        <div class="content" style="text-align:center;">
           <p>
-            This website is licensed under a <a rel="license"
-                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
-            Commons Attribution-ShareAlike 4.0 International License</a>.
-          </p>
-          <p>
-            This means you are free to borrow the <a
-              href="https://github.com/nerfies/nerfies.github.io">source code</a> of this website,
-            we just ask that you link back to this page in the footer.
-            Please remember to remove the analytics code included in the header of the website which
-            you do not want on your website.
+            This website is based on the <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> project page template, licensed under a
+            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
           </p>
         </div>
       </div>
