@@ -98,7 +98,7 @@
     }
 
     .grid-header .ours-highlight {
-      color: #E65100;
+      color: #2E7D32;
     }
 
     .row-label {
@@ -346,15 +346,13 @@
 
     <h3 class="title is-4 has-text-centered" style="margin-bottom:0.5rem;">ALLEX Humanoid Robot</h3>
 
-    <!-- Column headers -->
+    <!-- Row 1: In-distribution – Pick and Place Can -->
+    <p class="row-label"><strong>In-distribution task</strong> &mdash; Pick and Place Can</p>
     <div class="grid-header">
       <span>Real</span>
       <span>Real + DreamGen</span>
       <span class="ours-highlight">Real + <span class="robocurate">RoboCurate</span> (Ours)</span>
     </div>
-
-    <!-- Row 1: In-distribution – Pick and Place Can -->
-    <p class="row-label"><strong>In-distribution task</strong> &mdash; Pick and Place Can</p>
     <div class="video-grid">
       <div class="video-cell">
         <video autoplay muted loop playsinline>
@@ -378,6 +376,11 @@
 
     <!-- Row 2: OOD Novel Object – Pick and Place Cup -->
     <p class="row-label"><strong>Out-of-distribution task (Novel Object)</strong> &mdash; Pick and Place Cup</p>
+    <div class="grid-header">
+      <span>Real</span>
+      <span>Real + DreamGen</span>
+      <span class="ours-highlight">Real + <span class="robocurate">RoboCurate</span> (Ours)</span>
+    </div>
     <div class="video-grid">
       <div class="video-cell">
         <video autoplay muted loop playsinline>
@@ -401,6 +404,11 @@
 
     <!-- Row 3: OOD Novel Behavior – Pour Can -->
     <p class="row-label"><strong>Out-of-distribution task (Novel Behavior)</strong> &mdash; Pour Can</p>
+    <div class="grid-header">
+      <span>Real</span>
+      <span>Real + DreamGen</span>
+      <span class="ours-highlight">Real + <span class="robocurate">RoboCurate</span> (Ours)</span>
+    </div>
     <div class="video-grid">
       <div class="video-cell">
         <video autoplay muted loop playsinline>
